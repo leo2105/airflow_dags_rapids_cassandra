@@ -35,7 +35,7 @@ bash_command = """
 start = DummyOperator(task_id='run_this_first', dag=dag)
 
 passing = KubernetesPodOperator(namespace='default',
-                          image="python:3.6.15",
+                          image="rapidsai/rapidsai-core:23.02-cuda11.5-base-ubuntu20.04-py3.10",
                           cmds=["/bin/bash", "-c"],
                           arguments=["git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git"],
                           labels={"foo": "bar"},
