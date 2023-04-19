@@ -42,6 +42,7 @@ passing = KubernetesPodOperator(namespace='default',
                           name="passing-test",
                           task_id="passing-task",
                           get_logs=True,
+                          startup_timeout_seconds=900,
                           dag=dag
                           )
 
