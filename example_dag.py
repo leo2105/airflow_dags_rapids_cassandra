@@ -1,45 +1,48 @@
-from datetime import datetime, timedelta
-from random import randint
-
+"""
+Code that goes along with the Airflow located at:
+http://airflow.readthedocs.org/en/latest/tutorial.html
+"""
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-from airflow.operators.dummy_operator import DummyOperator
-from airflow.utils.dates import days_ago
+from datetime import datetime, timedelta
+
 
 default_args = {
-    'owner': 'Airflow',
-    'depends_on_past': False,
-    'start_date': days_ago(0),
-    'catchup': False,
-    'email': ['airflow@example.com'],
-    'email_on_failure': False,
-    'email_on_retry': False,
-    'retries': 0,
-    'retry_delay': timedelta(minutes=5),
+    "owner": "airflow",
+    "depends_on_past": False,
+    "start_date": datetime(2015, 6, 1),
+    "email": ["airflow@airflow.com"],
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
+    # 'queue': 'bash_queue',
+    # 'pool': 'backfill',
+    # 'priority_weight': 10,
+    # 'end_date': datetime(2016, 1, 1),
 }
 
-dag = DAG(
-    'example_dag',
-    default_args=default_args,
-    schedule_interval=timedelta(minutes=30),
-    max_active_runs=1,
-    concurrency=10
+dag = DAG("tutorial", default_args=default_args, schedule_interval=timedelta(1))
+
+# t1, t2 and t3 are examples of tasks created by instantiating operators
+t1 = BashOperator(task_id="print_date", bash_command="date", dag=dag)
+
+t2 = BashOperator(task_id="sleep", bash_command="sleep 5", retries=3, dag=dag)
+
+templated_command = """
+    {% for i in range(5) %}
+        echo "{{ ds }}"
+        echo "{{ macros.ds_add(ds, 7)}}"
+        echo "{{ params.my_param }}"
+    {% endfor %}
+"""
+
+t3 = BashOperator(
+    task_id="templated",
+    bash_command=templated_command,
+    params={"my_param": "Parameter I passed in"},
+    dag=dag,
 )
 
-# Generate 300 tasks
-tasks = ["task{}".format(i) for i in range(1, 301)]
-example_dag_complete_node = DummyOperator(task_id="example_dag_complete", dag=dag)
-
-org_dags = []
-for task in tasks:
-
-    bash_command = 'echo HELLO'
-
-    org_node = BashOperator(
-        task_id="{}".format(task),
-        bash_command=bash_command,
-        wait_for_downstream=False,
-        retries=5,
-        dag=dag
-    )
-    org_node.set_downstream(example_dag_complete_node)
+t2.set_upstream(t1)
+t3.set_upstream(t1)
