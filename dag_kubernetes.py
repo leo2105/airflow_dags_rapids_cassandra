@@ -31,6 +31,9 @@ bash_command = """
         python /workspace/cassandra_rapids_dags/airflow/utils/utils.py
         '
     """
+bash_command = "cd /workspace && \\
+                git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git && \\
+                python /workspace/cassandra_rapids_dags/airflow/utils/utils.py"
 
 start = DummyOperator(task_id='run_this_first', dag=dag)
 
@@ -38,7 +41,8 @@ passing = KubernetesPodOperator(namespace='default',
                           startup_timeout_seconds=900,
                           image="rapidsai/rapidsai-core:23.02-cuda11.5-base-ubuntu20.04-py3.10",
                           cmds=["/bin/bash", "-c"],
-                          arguments=["git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git && python /workspace/cassandra_rapids_dags/airflow/utils/utils.py"],
+
+                          arguments=[],
                           labels={"foo": "bar"},
                           name="passing-test",
                           task_id="passing-task",
