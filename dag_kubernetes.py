@@ -25,12 +25,19 @@ dag = DAG(
     'kubernetes_sample', catchup=False, default_args=default_args, schedule_interval=None, start_date=days_ago(1),)
 
 
+bash_command = """
+        /bin/bash -c '
+        git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git &&
+        python /workspace/cassandra_rapids_dags/airflow/utils/utils.py
+        '
+    """
+
 start = DummyOperator(task_id='run_this_first', dag=dag)
 
 passing = KubernetesPodOperator(namespace='default',
                           image="python:3.6.15",
-                          cmds=["python","-c"],
-                          arguments=["print('hello world')"],
+                          cmds=["/bin/bash", "-c"],
+                          arguments=["git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git"],
                           labels={"foo": "bar"},
                           name="passing-test",
                           task_id="passing-task",
@@ -38,16 +45,5 @@ passing = KubernetesPodOperator(namespace='default',
                           dag=dag
                           )
 
-failing = KubernetesPodOperator(namespace='default',
-                          image="ubuntu:16.04",
-                          cmds=["python","-c"],
-                          arguments=["print('hello world')"],
-                          labels={"foo": "bar"},
-                          name="fail",
-                          task_id="failing-task",
-                          get_logs=True,
-                          dag=dag
-                          )
 
 passing.set_upstream(start)
-failing.set_upstream(start)
