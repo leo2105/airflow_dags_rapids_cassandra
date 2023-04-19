@@ -24,7 +24,7 @@ default_args = {
 dag = DAG(
     'kubernetes_sample', catchup=False, default_args=default_args, schedule_interval=None, start_date=days_ago(1),)
 
-bash_command = """cd / && mkdir workspace && cd workpace && \\
+bash_command = """cd / && mkdir workspace && cd workspace && \\
                 git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git && \\
                 python /workspace/cassandra_rapids_dags/airflow/utils/utils.py"""
 
