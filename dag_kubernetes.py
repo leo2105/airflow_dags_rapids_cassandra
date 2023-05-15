@@ -30,7 +30,7 @@ bash_command = """cd / && mkdir workspace && cd workspace && \\
 
 start = DummyOperator(task_id='run_this_first', dag=dag)
 
-passing = KubernetesPodOperator(namespace='nvidia-device-plugin',
+passing = KubernetesPodOperator(namespace='default',
                           startup_timeout_seconds=900,
                           image="rapidsai/rapidsai-core:23.02-cuda11.5-base-ubuntu20.04-py3.10",
                           cmds=["/bin/bash", "-c"],
