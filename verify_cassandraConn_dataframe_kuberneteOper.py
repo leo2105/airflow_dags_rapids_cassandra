@@ -28,7 +28,7 @@ bash_command = """cd / && mkdir workspace && cd workspace && \\
                 git clone https://gitlab+deploy-token-1950569:125QUNzezM6ddxcjYiE2@gitlab.com/telconetcv/cassandra_rapids_dags.git && \\
                 python /workspace/cassandra_rapids_dags/airflow/utils/verify_cassandra_connection_and_dataframes.py"""
 
-start = DummyOperator(task_id='First task', dag=dag)
+start = DummyOperator(task_id='First_task', dag=dag)
 
 passing = KubernetesPodOperator(namespace='default',
                           startup_timeout_seconds=900,
@@ -37,7 +37,7 @@ passing = KubernetesPodOperator(namespace='default',
                           arguments=[bash_command],
                           labels={"foo": "bar"},
                           name="passing-test",
-                          task_id="Second task",
+                          task_id="Second_task",
                           get_logs=True,
                           dag=dag
                           )
